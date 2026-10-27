@@ -115,12 +115,12 @@ dd{margin:0;font-weight:600}
   }
   resize(); window.addEventListener('resize', resize);
 
-  /* ---------- Bintang (posisi tetap) ---------- */
+  
   var stars = [], seed = 7;
   function rnd(){ seed = (seed * 9301 + 49297) % 233280; return seed / 233280; }
   for (var i = 0; i < 70; i++) stars.push({x: rnd() * W, y: rnd() * 220, r: rnd() * 1.2 + .3, p: rnd() * 6});
 
-  /* ---------- Audio ---------- */
+
   var ac = null, master = null, an = null, freq = new Uint8Array(32);
   function ensureAudio(){
     if (!ac){
@@ -156,7 +156,6 @@ dd{margin:0;font-weight:600}
     o1.stop(t0 + dur + 0.05); o2.stop(t0 + dur + 0.05); ns.stop(t0 + dur + 0.05);
   }
 
-  /* ---------- Status ---------- */
   var barkStart = -10, now = 0;
   var BARK_GAP = 0.3, BARK_LEN = 0.2, BARK_N = 3;
   function bark(){
@@ -182,7 +181,6 @@ dd{margin:0;font-weight:600}
       e.preventDefault(); bark();
     }
   });
-  /* ---------- Animasi menyelam ---------- */
   var WATER_Y = 340, dive = null, parts = [];
   var PH = [['approach', 1.3, 'Menuju ke laut...'], ['plunge', 0.8, 'Byurr!'], ['swim', 2.6, 'Berenang di bawah air'], ['surface', 0.8, 'Muncul ke permukaan!'], ['return', 1.2, 'Kembali ke pantai']];
   function ease(p){ return p * p * (3 - 2 * p); }
@@ -256,7 +254,6 @@ dd{margin:0;font-weight:600}
   spd.addEventListener('input', function(){ spdv.textContent = Number(spd.value).toFixed(1) + 'x'; });
   vol.addEventListener('input', function(){ volv.textContent = vol.value + '%'; if (master) master.gain.value = vol.value / 100; });
 
-  /* ---------- Latar ---------- */
   function groundY(x){ var u = x / W; return 420 - 100 * u * (1 - u); }
 
   function drawScene(t){
@@ -272,22 +269,21 @@ dd{margin:0;font-weight:600}
     var sg = ctx.createRadialGradient(650, 245, 10, 650, 245, 120);
     sg.addColorStop(0, 'rgba(255,210,120,.7)'); sg.addColorStop(1, 'rgba(255,210,120,0)');
     ctx.fillStyle = sg; ctx.fillRect(530, 125, 240, 240);
-    ctx.fillStyle = '#fbd36b'; ctx.beginPath(); ctx.arc(650, 245, 40, 0, 6.283); ctx.fill();
-    // bukit es / daratan jauh
+    ctx.fillStyle = '#fbd36b';
     ctx.fillStyle = '#2a3350';
     ctx.beginPath(); ctx.moveTo(0, 300); ctx.lineTo(0, 262); ctx.lineTo(90, 232); ctx.lineTo(170, 270);
     ctx.lineTo(250, 245); ctx.lineTo(340, 300); ctx.closePath(); ctx.fill();
-    // laut
+   
     var sea = ctx.createLinearGradient(0, 300, 0, H);
     sea.addColorStop(0, '#34567a'); sea.addColorStop(1, '#13253b');
     ctx.fillStyle = sea; ctx.fillRect(0, 300, W, H - 300);
-    // pantulan matahari
+
     for (var j = 0; j < 9; j++){
       var w = 60 - j * 5 + Math.sin(t * 2 + j) * 6;
       ctx.fillStyle = 'rgba(255,214,130,' + (0.5 - j * 0.045) + ')';
       ctx.fillRect(650 - w / 2, 304 + j * 9, w, 3);
     }
-    // gelombang
+    
     ctx.strokeStyle = 'rgba(255,255,255,.14)'; ctx.lineWidth = 1.5;
     for (var r = 0; r < 4; r++){
       ctx.beginPath();
@@ -297,7 +293,7 @@ dd{margin:0;font-weight:600}
       }
       ctx.stroke();
     }
-    // pantai
+    
     ctx.fillStyle = '#4b4a5f';
     ctx.beginPath(); ctx.moveTo(0, H); ctx.lineTo(0, 420);
     ctx.quadraticCurveTo(W / 2, 370, W, 420); ctx.lineTo(W, H); ctx.closePath(); ctx.fill();
@@ -307,7 +303,7 @@ dd{margin:0;font-weight:600}
     }
   }
 
-  /* ---------- Anjing laut ---------- */
+  
   var phase = 0;
   function drawSeal(t, open, lift){
     var bob = Math.abs(Math.sin(phase)) * 2.5;
@@ -315,13 +311,13 @@ dd{margin:0;font-weight:600}
     ctx.translate(0, -bob);
     ctx.translate(-30, 0); ctx.rotate(-lift * 0.25); ctx.translate(30, 0);
 
-    // sirip ekor
+    
     ctx.fillStyle = '#6f7f8c';
     var sw = Math.sin(phase) * 3;
     ctx.beginPath(); ctx.moveTo(-100, -9); ctx.lineTo(-130, -24 + sw); ctx.lineTo(-124, -9);
     ctx.lineTo(-130, 4 - sw); ctx.closePath(); ctx.fill();
 
-    // badan
+    
     ctx.fillStyle = '#8a9aa8';
     ctx.beginPath(); ctx.moveTo(-110, -8);
     ctx.bezierCurveTo(-80, -45, -20, -62, 40, -58);
@@ -331,22 +327,22 @@ dd{margin:0;font-weight:600}
     ctx.bezierCurveTo(-80, 0, -100, -2, -110, -8);
     ctx.closePath(); ctx.fill();
 
-    // perut
+   
     ctx.fillStyle = '#c9d3da';
     ctx.beginPath(); ctx.ellipse(18, -11, 60, 8, 0, 0, 6.283); ctx.fill();
 
-    // bercak
+   
     ctx.fillStyle = '#5f6f7c';
     [[-70,-26,3],[-48,-38,4.5],[-22,-47,4],[6,-50,5],[-35,-24,3.2],[28,-44,3]].forEach(function(s){
       ctx.beginPath(); ctx.arc(s[0], s[1], s[2], 0, 6.283); ctx.fill();
     });
 
-    // sirip depan
+    
     ctx.save(); ctx.translate(46, -16); ctx.rotate(0.9 + Math.sin(phase) * 0.35);
     ctx.fillStyle = '#6f7f8c'; ctx.beginPath(); ctx.ellipse(0, 10, 6, 17, 0, 0, 6.283); ctx.fill();
     ctx.restore();
 
-    // mata
+    
     var blink = (t % 4) < 0.12;
     if (blink){
       ctx.strokeStyle = '#1d232b'; ctx.lineWidth = 2;
@@ -355,7 +351,7 @@ dd{margin:0;font-weight:600}
       ctx.fillStyle = '#1d232b'; ctx.beginPath(); ctx.ellipse(83, -38, 3.6, 4, 0, 0, 6.283); ctx.fill();
       ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(84.2, -39.4, 1.1, 0, 6.283); ctx.fill();
     }
-    // hidung & mulut
+    
     ctx.fillStyle = '#1d232b'; ctx.beginPath(); ctx.ellipse(102, -34, 5, 3.5, 0, 0, 6.283); ctx.fill();
     if (open){
       ctx.fillStyle = '#4a2328'; ctx.beginPath(); ctx.ellipse(96, -21, 8, 5.5, 0.15, 0, 6.283); ctx.fill();
@@ -363,7 +359,7 @@ dd{margin:0;font-weight:600}
       ctx.strokeStyle = '#3b4753'; ctx.lineWidth = 1.5;
       ctx.beginPath(); ctx.moveTo(91, -22); ctx.quadraticCurveTo(97, -19, 102, -23); ctx.stroke();
     }
-    // kumis
+   
     ctx.strokeStyle = 'rgba(255,255,255,.85)'; ctx.lineWidth = 1;
     var sway = Math.sin(t * 3) * 1.2;
     [[-34, 0],[-27, 3],[-20, 6]].forEach(function(w){
@@ -372,7 +368,7 @@ dd{margin:0;font-weight:600}
     ctx.restore();
   }
 
-  /* ---------- Equalizer ---------- */
+  
   function drawEq(){
     ectx.clearRect(0, 0, eqc.width, eqc.height);
     var active = an && barking();
@@ -389,8 +385,7 @@ dd{margin:0;font-weight:600}
     }
   }
 
-  /* ---------- Loop ---------- */
-  var sx = 160, dir = 1, last = performance.now(), t = 0;
+    var sx = 160, dir = 1, last = performance.now(), t = 0;
   function frame(ts){
     var dt = Math.min(0.05, (ts - last) / 1000); last = ts;
     t += dt; now = t;
@@ -414,14 +409,14 @@ dd{margin:0;font-weight:600}
     var gy = gy0 + (WATER_Y - gy0) * wet + 40 * depth;
     var sc = 1 - 0.4 * wet;
     var slope = Math.atan(-100 * (1 - 2 * sx / W) / W) * (1 - wet);
-    // bayangan
+    
     ctx.fillStyle = 'rgba(0,0,0,' + (0.28 * (1 - wet)) + ')';
     ctx.beginPath(); ctx.ellipse(sx, gy + 2, 105, 9, 0, 0, 6.283); ctx.fill();
     if (wet > 0 && depth < 1) drawRipple(sx, WATER_Y, sc, t);
 
     ctx.save(); ctx.globalAlpha = 1 - 0.45 * depth;
     ctx.translate(sx, gy); ctx.rotate((slope + tilt) * dir); ctx.scale(dir * sc, sc);
-    // gelombang suara
+   
     if (a >= 0 && a < BARK_GAP * BARK_N + 0.9){
       for (var k = 0; k < BARK_N; k++){
         var age = a - k * BARK_GAP;
