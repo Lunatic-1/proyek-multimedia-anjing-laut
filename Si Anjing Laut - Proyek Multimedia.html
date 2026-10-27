@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Si Anjing Laut - Proyek Multimedia</title>
+<style>
+:root{
+  --bg:#eef2f6; --card:#ffffff; --ink:#1c2733; --muted:#55657a; --line:#c9d3de;
+  --head:#1f3247; --accent:#1f6f9f; --accent-ink:#ffffff; --soft:#e6f0f7; --badge:#f2c94c;
+}
+@media (prefers-color-scheme: dark){
+  :root[data-auto]{ }
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:"Segoe UI",Roboto,Arial,sans-serif;line-height:1.45;
+  padding:16px;padding-top:max(16px,env(safe-area-inset-top,0px));padding-bottom:max(16px,env(safe-area-inset-bottom,0px))}
+.wrap{max-width:1150px;margin:0 auto}
+header{background:var(--head);color:#fff;border-radius:8px;padding:16px 22px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+header h1{margin:0;font-size:1.5rem}
+header h1 span{color:#9fd3f0}
+header p{margin:4px 0 0;font-size:.9rem;color:#cfdbe7}
+.badge{background:var(--badge);color:#1c2733;font-weight:600;font-size:.85rem;padding:8px 14px;border-radius:999px}
+main{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px;margin-top:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px}
+.stagebox{position:relative;border-radius:6px;overflow:hidden;background:#1b2a49}
+canvas#stage{display:block;width:100%;aspect-ratio:8/5;cursor:pointer}
+#eq{position:absolute;left:12px;top:12px;background:rgba(10,20,35,.55);border-radius:6px;padding:6px 8px}
+#bubble{position:absolute;right:12px;top:12px;max-width:60%;background:#fff;color:var(--ink);font-size:.85rem;font-weight:600;padding:8px 12px;border-radius:10px}
+.caption{margin:10px 2px 0;font-size:.9rem;color:var(--muted)}
+.caption b{color:var(--ink)}
+h2{font-size:1.05rem;margin:0 0 12px}
+.ctl{border:1px solid var(--line);border-radius:6px;padding:10px 12px;margin-bottom:12px}
+.ctl label{display:flex;justify-content:space-between;font-weight:600;font-size:.92rem;margin-bottom:6px}
+.ctl output{background:var(--head);color:#fff;border-radius:4px;padding:0 8px;font-size:.8rem;line-height:1.6}
+input[type=range]{width:100%;accent-color:var(--accent)}
+button#bark{width:100%;font:inherit;font-weight:600;font-size:1rem;color:var(--accent-ink);background:var(--accent);border:0;border-radius:6px;padding:12px;cursor:pointer;margin-bottom:12px}
+button#bark:hover{background:#185a82}
+button#bark:focus-visible{outline:3px solid #9fd3f0;outline-offset:2px}
+button#dive{width:100%;font:inherit;font-weight:600;font-size:1rem;color:var(--head);background:#fff;border:1px solid var(--head);border-radius:6px;padding:11px;cursor:pointer;margin-bottom:12px}
+button#dive:hover{background:var(--soft)}
+button#dive:focus-visible{outline:3px solid #9fd3f0;outline-offset:2px}
+.tip{background:var(--soft);border:1px dashed var(--accent);border-radius:6px;padding:10px 12px;font-size:.88rem;margin-bottom:14px}
+kbd{background:var(--head);color:#fff;border-radius:4px;padding:1px 7px;font-size:.8rem}
+h3{font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+dl{margin:0 0 12px;font-size:.9rem}
+dl div{display:flex;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)}
+dt{color:var(--muted);min-width:100px}
+dd{margin:0;font-weight:600}
+.tags span{display:inline-block;border:1px solid var(--line);background:var(--soft);border-radius:999px;font-size:.78rem;font-weight:600;padding:4px 10px;margin:0 6px 6px 0}
+@media (max-width:860px){ main{grid-template-columns:1fr} #bubble{max-width:70%;font-size:.75rem} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1><span>OWK</span> si Anjing Laut</h1>
+      <p>Proyek Multimedia: Gambar Bergerak dan Bersuara — anjing laut berjalan di pantai saat senja</p>
+    </div>
+    <div class="badge" id="idbadge">Muhammad Miftakhul Faizin · NIM 242502040022</div>
+  </header>
+
+  <main>
+    <section class="card">
+      <div class="stagebox">
+        <canvas id="stage" aria-label="Animasi anjing laut berjalan di pantai"></canvas>
+        <canvas id="eq" width="84" height="34"></canvas>
+        <div id="bubble">Psst... klik aku, aku bisa menggonggong!</div>
+      </div>
+      <p class="caption"><b>Siaran langsung dari pantai senja</b> — anjing lautnya sedang berjalan santai, klik panggungnya untuk mendengar gonggongannya.</p>
+    </section>
+
+    <aside class="card">
+      <h2>Panel Kendali</h2>
+      <button id="bark" type="button">Menggonggong Sekarang</button>
+      <button id="dive" type="button">Menyelam ke Laut</button>
+      <div class="ctl">
+        <label for="spd">Kecepatan jalan <output id="spdv">1.0x</output></label>
+        <input id="spd" type="range" min="0.5" max="2" step="0.1" value="1">
+      </div>
+      <div class="ctl">
+        <label for="vol">Volume suara <output id="volv">80%</output></label>
+        <input id="vol" type="range" min="0" max="100" step="1" value="80">
+      </div>
+      <div class="tip">Tips: tekan <kbd>Spasi</kbd> untuk menggonggong dan <kbd>D</kbd> untuk menyelam. Suaranya dibangkitkan langsung oleh Web Audio, dan equalizer kecil di pojok kiri atas panggung mengikuti volumenya.</div>
+
+      <h3>Kenalan sama anjing lautnya</h3>
+      <dl>
+        <div><dt>Nama latin</dt><dd>Phoca vitulina</dd></div>
+        <div><dt>Nama umum</dt><dd>Anjing laut pelabuhan</dd></div>
+        <div><dt>Menyelam</dt><dd>Mampu menahan napas hingga sekitar 30 menit</dd></div>
+        <div><dt>Kumis</dt><dd>Peka terhadap getaran di dalam air</dd></div>
+      </dl>
+      <div class="tags"><span>Tugas Multimedia</span><span>HTML5 Canvas</span><span>Web Audio API</span></div>
+    </aside>
+  </main>
+</div>
+
+<script>
+(function(){
+  var W = 800, H = 500;
+  var cv = document.getElementById('stage'), ctx = cv.getContext('2d');
+  var eqc = document.getElementById('eq'), ectx = eqc.getContext('2d');
+  var bubble = document.getElementById('bubble');
+  var spd = document.getElementById('spd'), vol = document.getElementById('vol');
+  var spdv = document.getElementById('spdv'), volv = document.getElementById('volv');
+  var HINT = 'Psst... klik aku, aku bisa menggonggong!';
+
+  function resize(){
+    var dpr = window.devicePixelRatio || 1;
+    cv.width = W * dpr; cv.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  resize(); window.addEventListener('resize', resize);
+
+  /* ---------- Bintang (posisi tetap) ---------- */
+  var stars = [], seed = 7;
+  function rnd(){ seed = (seed * 9301 + 49297) % 233280; return seed / 233280; }
+  for (var i = 0; i < 70; i++) stars.push({x: rnd() * W, y: rnd() * 220, r: rnd() * 1.2 + .3, p: rnd() * 6});
+
+  /* ---------- Audio ---------- */
+  var ac = null, master = null, an = null, freq = new Uint8Array(32);
+  function ensureAudio(){
+    if (!ac){
+      var AC = window.AudioContext || window.webkitAudioContext;
+      ac = new AC(); master = ac.createGain();
+      an = ac.createAnalyser(); an.fftSize = 64;
+      master.connect(an); an.connect(ac.destination);
+    }
+    if (ac.state === 'suspended') ac.resume();
+    master.gain.value = vol.value / 100;
+  }
+  function burst(t0, f0){
+    var dur = 0.2;
+    var filt = ac.createBiquadFilter(); filt.type = 'bandpass'; filt.frequency.value = 750; filt.Q.value = 1.4;
+    var env = ac.createGain();
+    env.gain.setValueAtTime(0.0001, t0);
+    env.gain.exponentialRampToValueAtTime(1, t0 + 0.02);
+    env.gain.exponentialRampToValueAtTime(0.001, t0 + dur);
+    var o1 = ac.createOscillator(); o1.type = 'sawtooth';
+    o1.frequency.setValueAtTime(f0 * 1.3, t0);
+    o1.frequency.exponentialRampToValueAtTime(f0 * 0.7, t0 + dur);
+    var o2 = ac.createOscillator(); o2.type = 'square';
+    o2.frequency.setValueAtTime(f0 * 2.6, t0);
+    o2.frequency.exponentialRampToValueAtTime(f0 * 1.4, t0 + dur);
+    var g2 = ac.createGain(); g2.gain.value = 0.18;
+    var len = Math.floor(ac.sampleRate * dur), buf = ac.createBuffer(1, len, ac.sampleRate), d = buf.getChannelData(0);
+    for (var i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+    var ns = ac.createBufferSource(); ns.buffer = buf;
+    var gn = ac.createGain(); gn.gain.value = 0.3;
+    o1.connect(filt); o2.connect(g2); g2.connect(filt); ns.connect(gn); gn.connect(filt);
+    filt.connect(env); env.connect(master);
+    o1.start(t0); o2.start(t0); ns.start(t0);
+    o1.stop(t0 + dur + 0.05); o2.stop(t0 + dur + 0.05); ns.stop(t0 + dur + 0.05);
+  }
+
+  /* ---------- Status ---------- */
+  var barkStart = -10, now = 0;
+  var BARK_GAP = 0.3, BARK_LEN = 0.2, BARK_N = 3;
+  function bark(){
+    ensureAudio();
+    var t = ac.currentTime + 0.02;
+    for (var k = 0; k < BARK_N; k++) burst(t + k * BARK_GAP, 260 - k * 20);
+    barkStart = now;
+  }
+  function barkAge(){ return now - barkStart; }
+  function mouthOpen(){
+    var a = barkAge();
+    if (a < 0 || a > BARK_GAP * BARK_N) return false;
+    return (a % BARK_GAP) < BARK_LEN;
+  }
+  function barking(){ return barkAge() >= 0 && barkAge() < BARK_GAP * BARK_N + 0.1; }
+
+  document.getElementById('bark').addEventListener('click', function(e){ bark(); e.currentTarget.blur(); });
+  cv.addEventListener('click', bark);
+  document.addEventListener('keydown', function(e){
+    if (e.code === 'Space' && !e.repeat){
+      var tag = e.target && e.target.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+      e.preventDefault(); bark();
+    }
+  });
+  /* ---------- Animasi menyelam ---------- */
+  var WATER_Y = 340, dive = null, parts = [];
+  var PH = [['approach', 1.3, 'Menuju ke laut...'], ['plunge', 0.8, 'Byurr!'], ['swim', 2.6, 'Berenang di bawah air'], ['surface', 0.8, 'Muncul ke permukaan!'], ['return', 1.2, 'Kembali ke pantai']];
+  function ease(p){ return p * p * (3 - 2 * p); }
+  function splash(x, n){
+    for (var i = 0; i < n; i++) parts.push({x: x + (Math.random() - .5) * 50, y: WATER_Y, vx: (Math.random() - .5) * 90, vy: -(70 + Math.random() * 110), life: 0.8, type: 'd'});
+  }
+  function startDive(){ if (!dive) dive = {i: 0, p: 0, fired: false}; }
+  function divePose(dt, s){
+    var ph = PH[dive.i];
+    dive.p += dt / ph[1];
+    if (dive.p >= 1){
+      dive.i++; dive.p = 0; dive.fired = false;
+      if (dive.i >= PH.length){ dive = null; return null; }
+      ph = PH[dive.i];
+    }
+    var name = ph[0], p = dive.p, e = ease(p);
+    var o = {wet: 1, depth: 0, tilt: 0, label: ph[2]};
+    phase += dt * (name === 'swim' ? 9 : 5) * s;
+    if (name === 'approach' || name === 'return') sx += dir * 20 * s * dt;
+    else if (name === 'swim') sx += dir * 70 * s * dt;
+    if (sx > 640){ sx = 640; dir = -1; }
+    if (sx < 150){ sx = 150; dir = 1; }
+    if (name === 'approach') o.wet = e;
+    else if (name === 'plunge'){ o.depth = e; o.tilt = Math.sin(p * Math.PI) * 0.7; }
+    else if (name === 'swim'){ o.depth = 1; o.tilt = Math.sin(p * 9.4) * 0.06; }
+    else if (name === 'surface'){ o.depth = 1 - e; o.tilt = -Math.sin(p * Math.PI) * 0.35; }
+    else if (name === 'return') o.wet = 1 - e;
+    if (!dive.fired && (name === 'plunge' || name === 'surface')){ splash(sx + dir * 45, 14); dive.fired = true; }
+    if ((name === 'swim' || name === 'plunge') && Math.random() < dt * 14){
+      parts.push({x: sx + dir * 45 + (Math.random() - .5) * 20, y: WATER_Y + 30, vx: (Math.random() - .5) * 10, vy: -(25 + Math.random() * 20), life: 1.5, type: 'b'});
+    }
+    return o;
+  }
+  function updateParts(dt){
+    for (var i = parts.length - 1; i >= 0; i--){
+      var q = parts[i];
+      q.life -= dt; q.x += q.vx * dt; q.y += q.vy * dt;
+      if (q.type === 'd') q.vy += 260 * dt;
+      if (q.life <= 0 || (q.type === 'b' && q.y < WATER_Y) || (q.type === 'd' && q.vy > 0 && q.y > WATER_Y)) parts.splice(i, 1);
+    }
+  }
+  function drawParts(){
+    parts.forEach(function(q){
+      if (q.type === 'd'){
+        ctx.fillStyle = 'rgba(255,255,255,' + (Math.min(1, q.life * 1.5) * 0.8) + ')';
+        ctx.beginPath(); ctx.arc(q.x, q.y, 2.2, 0, 6.283); ctx.fill();
+      } else {
+        ctx.strokeStyle = 'rgba(255,255,255,' + Math.min(0.6, q.life) + ')'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.arc(q.x, q.y, 3, 0, 6.283); ctx.stroke();
+      }
+    });
+  }
+  function drawRipple(x, y, sc, t){
+    ctx.strokeStyle = 'rgba(255,255,255,.4)'; ctx.lineWidth = 1.5;
+    for (var k = 0; k < 2; k++){
+      var r = (t * 0.8 + k * 0.5) % 1;
+      ctx.globalAlpha = 1 - r;
+      ctx.beginPath(); ctx.ellipse(x, y + 2, 50 * sc + r * 40, 5 + r * 5, 0, 0, 6.283); ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+  }
+  document.getElementById('dive').addEventListener('click', function(e){ startDive(); e.currentTarget.blur(); });
+  document.addEventListener('keydown', function(e){
+    if (e.code === 'KeyD' && !e.repeat){
+      var tag = e.target && e.target.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+      startDive();
+    }
+  });
+
+  spd.addEventListener('input', function(){ spdv.textContent = Number(spd.value).toFixed(1) + 'x'; });
+  vol.addEventListener('input', function(){ volv.textContent = vol.value + '%'; if (master) master.gain.value = vol.value / 100; });
+
+  /* ---------- Latar ---------- */
+  function groundY(x){ var u = x / W; return 420 - 100 * u * (1 - u); }
+
+  function drawScene(t){
+    var g = ctx.createLinearGradient(0, 0, 0, 300);
+    g.addColorStop(0, '#16233f'); g.addColorStop(.55, '#4e4a78'); g.addColorStop(1, '#e08a5a');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, 300);
+    for (var i = 0; i < stars.length; i++){
+      var s = stars[i];
+      ctx.globalAlpha = .45 + .45 * Math.sin(t * 1.5 + s.p);
+      ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, 6.283); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    var sg = ctx.createRadialGradient(650, 245, 10, 650, 245, 120);
+    sg.addColorStop(0, 'rgba(255,210,120,.7)'); sg.addColorStop(1, 'rgba(255,210,120,0)');
+    ctx.fillStyle = sg; ctx.fillRect(530, 125, 240, 240);
+    ctx.fillStyle = '#fbd36b'; ctx.beginPath(); ctx.arc(650, 245, 40, 0, 6.283); ctx.fill();
+    // bukit es / daratan jauh
+    ctx.fillStyle = '#2a3350';
+    ctx.beginPath(); ctx.moveTo(0, 300); ctx.lineTo(0, 262); ctx.lineTo(90, 232); ctx.lineTo(170, 270);
+    ctx.lineTo(250, 245); ctx.lineTo(340, 300); ctx.closePath(); ctx.fill();
+    // laut
+    var sea = ctx.createLinearGradient(0, 300, 0, H);
+    sea.addColorStop(0, '#34567a'); sea.addColorStop(1, '#13253b');
+    ctx.fillStyle = sea; ctx.fillRect(0, 300, W, H - 300);
+    // pantulan matahari
+    for (var j = 0; j < 9; j++){
+      var w = 60 - j * 5 + Math.sin(t * 2 + j) * 6;
+      ctx.fillStyle = 'rgba(255,214,130,' + (0.5 - j * 0.045) + ')';
+      ctx.fillRect(650 - w / 2, 304 + j * 9, w, 3);
+    }
+    // gelombang
+    ctx.strokeStyle = 'rgba(255,255,255,.14)'; ctx.lineWidth = 1.5;
+    for (var r = 0; r < 4; r++){
+      ctx.beginPath();
+      for (var x = 0; x <= W; x += 10){
+        var y = 322 + r * 18 + Math.sin(x / 40 + t * 1.2 + r) * 2.5;
+        if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    }
+    // pantai
+    ctx.fillStyle = '#4b4a5f';
+    ctx.beginPath(); ctx.moveTo(0, H); ctx.lineTo(0, 420);
+    ctx.quadraticCurveTo(W / 2, 370, W, 420); ctx.lineTo(W, H); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,.1)';
+    for (var p = 0; p < 14; p++){
+      ctx.beginPath(); ctx.arc((p * 83 + 30) % W, 440 + (p * 37) % 50, 2.5, 0, 6.283); ctx.fill();
+    }
+  }
+
+  /* ---------- Anjing laut ---------- */
+  var phase = 0;
+  function drawSeal(t, open, lift){
+    var bob = Math.abs(Math.sin(phase)) * 2.5;
+    ctx.save();
+    ctx.translate(0, -bob);
+    ctx.translate(-30, 0); ctx.rotate(-lift * 0.25); ctx.translate(30, 0);
+
+    // sirip ekor
+    ctx.fillStyle = '#6f7f8c';
+    var sw = Math.sin(phase) * 3;
+    ctx.beginPath(); ctx.moveTo(-100, -9); ctx.lineTo(-130, -24 + sw); ctx.lineTo(-124, -9);
+    ctx.lineTo(-130, 4 - sw); ctx.closePath(); ctx.fill();
+
+    // badan
+    ctx.fillStyle = '#8a9aa8';
+    ctx.beginPath(); ctx.moveTo(-110, -8);
+    ctx.bezierCurveTo(-80, -45, -20, -62, 40, -58);
+    ctx.bezierCurveTo(70, -56, 88, -52, 100, -38);
+    ctx.bezierCurveTo(108, -30, 104, -18, 92, -14);
+    ctx.bezierCurveTo(60, -4, 0, 2, -50, 0);
+    ctx.bezierCurveTo(-80, 0, -100, -2, -110, -8);
+    ctx.closePath(); ctx.fill();
+
+    // perut
+    ctx.fillStyle = '#c9d3da';
+    ctx.beginPath(); ctx.ellipse(18, -11, 60, 8, 0, 0, 6.283); ctx.fill();
+
+    // bercak
+    ctx.fillStyle = '#5f6f7c';
+    [[-70,-26,3],[-48,-38,4.5],[-22,-47,4],[6,-50,5],[-35,-24,3.2],[28,-44,3]].forEach(function(s){
+      ctx.beginPath(); ctx.arc(s[0], s[1], s[2], 0, 6.283); ctx.fill();
+    });
+
+    // sirip depan
+    ctx.save(); ctx.translate(46, -16); ctx.rotate(0.9 + Math.sin(phase) * 0.35);
+    ctx.fillStyle = '#6f7f8c'; ctx.beginPath(); ctx.ellipse(0, 10, 6, 17, 0, 0, 6.283); ctx.fill();
+    ctx.restore();
+
+    // mata
+    var blink = (t % 4) < 0.12;
+    if (blink){
+      ctx.strokeStyle = '#1d232b'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(79, -38); ctx.lineTo(87, -38); ctx.stroke();
+    } else {
+      ctx.fillStyle = '#1d232b'; ctx.beginPath(); ctx.ellipse(83, -38, 3.6, 4, 0, 0, 6.283); ctx.fill();
+      ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(84.2, -39.4, 1.1, 0, 6.283); ctx.fill();
+    }
+    // hidung & mulut
+    ctx.fillStyle = '#1d232b'; ctx.beginPath(); ctx.ellipse(102, -34, 5, 3.5, 0, 0, 6.283); ctx.fill();
+    if (open){
+      ctx.fillStyle = '#4a2328'; ctx.beginPath(); ctx.ellipse(96, -21, 8, 5.5, 0.15, 0, 6.283); ctx.fill();
+    } else {
+      ctx.strokeStyle = '#3b4753'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(91, -22); ctx.quadraticCurveTo(97, -19, 102, -23); ctx.stroke();
+    }
+    // kumis
+    ctx.strokeStyle = 'rgba(255,255,255,.85)'; ctx.lineWidth = 1;
+    var sway = Math.sin(t * 3) * 1.2;
+    [[-34, 0],[-27, 3],[-20, 6]].forEach(function(w){
+      ctx.beginPath(); ctx.moveTo(97, -28 + w[1] * 0.4); ctx.lineTo(120, w[0] + sway); ctx.stroke();
+    });
+    ctx.restore();
+  }
+
+  /* ---------- Equalizer ---------- */
+  function drawEq(){
+    ectx.clearRect(0, 0, eqc.width, eqc.height);
+    var active = an && barking();
+    if (active) an.getByteFrequencyData(freq);
+    for (var i = 0; i < 8; i++){
+      var x = 4 + i * 10;
+      if (active){
+        var v = (freq[1 + i * 2] + freq[2 + i * 2]) / 510;
+        var h = Math.max(3, v * 28);
+        ectx.fillStyle = '#9fd3f0'; ectx.fillRect(x, 31 - h, 7, h);
+      } else {
+        ectx.fillStyle = '#f2c94c'; ectx.fillRect(x, 28, 7, 2);
+      }
+    }
+  }
+
+  /* ---------- Loop ---------- */
+  var sx = 160, dir = 1, last = performance.now(), t = 0;
+  function frame(ts){
+    var dt = Math.min(0.05, (ts - last) / 1000); last = ts;
+    t += dt; now = t;
+    var s = Number(spd.value);
+    var pose = dive ? divePose(dt, s) : null;
+    var moving = !dive && !barking();
+    if (moving){
+      sx += dir * 45 * s * dt; phase += dt * 5 * s;
+      if (sx > 640){ sx = 640; dir = -1; }
+      if (sx < 150){ sx = 150; dir = 1; }
+    }
+    updateParts(dt);
+    drawScene(t);
+
+    var open = mouthOpen();
+    var a = barkAge(), lift = 0;
+    if (a >= 0 && a < BARK_GAP * BARK_N) lift = open ? 1 : 0.4;
+
+    var gy0 = groundY(sx) + 8;
+    var wet = pose ? pose.wet : 0, depth = pose ? pose.depth : 0, tilt = pose ? pose.tilt : 0;
+    var gy = gy0 + (WATER_Y - gy0) * wet + 40 * depth;
+    var sc = 1 - 0.4 * wet;
+    var slope = Math.atan(-100 * (1 - 2 * sx / W) / W) * (1 - wet);
+    // bayangan
+    ctx.fillStyle = 'rgba(0,0,0,' + (0.28 * (1 - wet)) + ')';
+    ctx.beginPath(); ctx.ellipse(sx, gy + 2, 105, 9, 0, 0, 6.283); ctx.fill();
+    if (wet > 0 && depth < 1) drawRipple(sx, WATER_Y, sc, t);
+
+    ctx.save(); ctx.globalAlpha = 1 - 0.45 * depth;
+    ctx.translate(sx, gy); ctx.rotate((slope + tilt) * dir); ctx.scale(dir * sc, sc);
+    // gelombang suara
+    if (a >= 0 && a < BARK_GAP * BARK_N + 0.9){
+      for (var k = 0; k < BARK_N; k++){
+        var age = a - k * BARK_GAP;
+        if (age > 0 && age < 0.8){
+          ctx.strokeStyle = 'rgba(255,255,255,' + (0.55 * (1 - age / 0.8)) + ')';
+          ctx.lineWidth = 2.5; ctx.beginPath();
+          ctx.arc(98, -26, 12 + age * 150, -0.7, 0.7); ctx.stroke();
+        }
+      }
+    }
+    drawSeal(t, open, lift);
+    ctx.restore();
+
+    drawParts();
+    bubble.textContent = barking() ? 'OWK! OWK! OWK!' : (pose ? pose.label : HINT);
+    drawEq();
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
